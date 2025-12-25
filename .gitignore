@@ -1,0 +1,9 @@
+/bespin-chat-app-website/chat-robot-website/build/
+/bespin-chat-app-service/target/
+/bespin-chat-app-service/chat-app.iml
+/bespin-chat-manager-website/dist/
+/bespin-chat-app-service/chat-app-api/
+/bespin-chat-manager-website/node_modules
+node_modules
+dist
+.vscode/

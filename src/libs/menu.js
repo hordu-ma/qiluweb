@@ -1,0 +1,63 @@
+const menusList = [{
+    name: 'customerOrders?type=0',
+    icon: 'md-book',
+    title: '客户概括',
+    showMenu: true,
+    identityList: ['ADMIN'],
+}, {
+    name: 'serviceOrders?type=0',
+    icon: 'md-book',
+    title: '客户查询',
+    showMenu: true,
+    identityList: ['ADMIN'],
+}, {
+    name: 'customerOrders?type=1',
+    icon: 'md-book',
+    title: '人群圈选',
+    showMenu: true,
+    identityList: ['ADMIN'],
+}, {
+    name: 'tagManger?type=0',
+    icon: 'md-book',
+    title: '标签管理',
+    showMenu: true,
+    identityList: ['ADMIN'],
+}, {
+    name: 'customerOrders?type=2',
+    icon: 'md-book',
+    title: '等级管理',
+    showMenu: true,
+    identityList: ['ADMIN'],
+}, {
+    name: 'serviceOrders?type=2',
+    icon: 'md-book',
+    title: '积分管理',
+    showMenu: true,
+    identityList: ['ADMIN'],
+}, {
+    name: 'serviceOrders?type=5',
+    icon: 'md-book',
+    title: '勋章管理',
+    showMenu: true,
+    identityList: ['ADMIN'],
+}, {
+    name: 'serviceOrders?type=6',
+    icon: 'md-book',
+    title: '设备管理',
+    showMenu: true,
+    identityList: ['ADMIN'],
+}, {
+    name: 'ispManager',
+    icon: 'ios-people',
+    title: '事件管理',
+    showMenu: true,
+    identityList: ['ADMIN'],
+}, {
+    name: 'roles',
+    icon: 'ios-person',
+    title: '系统管理',
+    showMenu: false,
+    identityList: ['ADMIN'],
+}];
+
+export default menusList;

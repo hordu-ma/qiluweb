@@ -1,0 +1,30 @@
+{
+  "id": "4963530",
+  "name": "shandaW",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "23702575",
+      "name": "望远镜",
+      "font_class": "wangyuanjing",
+      "unicode": "e639",
+      "unicode_decimal": 58937
+    },
+    {
+      "icon_id": "2766438",
+      "name": "显示密码",
+      "font_class": "xianshimima1",
+      "unicode": "e611",
+      "unicode_decimal": 58897
+    },
+    {
+      "icon_id": "2767157",
+      "name": "隐藏密码",
+      "font_class": "yincangmima",
+      "unicode": "e612",
+      "unicode_decimal": 58898
+    }
+  ]
+}

@@ -1,0 +1,226 @@
+.login-main {
+  width: 100%;
+  height: 100%;
+  background-color: #f4f5f6;
+  cursor: default;
+  font-size: 14px;
+
+  .body {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .login-panel {
+      width: 510px;
+      height: 700px;
+      background: #ffffff;
+      box-shadow: 0px 3px 7px 0px rgba(16, 165, 147, 0.21);
+      border-radius: 20px;
+      background-color: #fff;
+      // border-radius: 10px;
+      margin: 0 auto;
+      font-weight: 600;
+      font-size: 16px;
+      color: #000000;
+      line-height: 27px;
+      text-align: center;
+
+      .login-panel-title {
+        // font-size: 28px;
+        // color: #136eb4;
+        // font-weight: bold;
+        // text-align: center;
+        // font-style: italic;
+        padding-top: 52px;
+        line-height: 0.8;
+      }
+
+      .login-panel-logo {
+        // width: 160px;
+        // height: 60px;
+        padding-bottom: 40px;
+        background-size: contain;
+        margin: 0 auto;
+        // font-weight: bold;
+        // font-size: 130%;
+      }
+
+      .login-input-line {
+        height: 50px;
+        line-height: 30px;
+        background-color: #fff;
+        margin: 35px 50px 10px;
+        position: relative;
+        // border-bottom: 1px solid #c2d4dc;
+
+        .input-line-title {
+          position: absolute;
+          top: -30px;
+          left: 0;
+          color: #000000;
+          font-weight: bold;
+          font-size: 14px;
+          &::before {
+            content: "*";
+            color: #e52323;
+            margin-right: 4px;
+          }
+        }
+
+        .login-icon {
+          width: 50px;
+          height: 50px;
+          display: block;
+          background-size: 30px;
+          background-repeat: no-repeat;
+          background-position: center;
+        }
+
+        .empty-txt-icon,
+        .iconfont {
+          width: 20px;
+          height: 20px;
+          background-size: 20px;
+          cursor: pointer;
+          position: absolute;
+          top: 9px;
+          right: 5px;
+        }
+
+        .verify-code-clear-icon {
+          right: 5px;
+          z-index: 2; // 确保清除图标在文字上方
+        }
+        .iconfont {
+          right: 30px;
+          line-height: 22px;
+          font-size: 20px;
+          color: #9e9c9c;
+        }
+
+        .verify-code-wrapper {
+          position: relative;
+          width: 100%;
+          height: 40px;
+
+          .get-code-text {
+            font-size: 14px;
+          }
+
+          // 当有清除图标时，获取验证码文字往左移
+          .get-code-text.has-clear-icon {
+            right: 30px;
+          }
+        }
+
+        .user-name-txt {
+          width: 100%;
+          height: 40px;
+          border-radius: 10px;
+          border: 1px solid #d3d3d3;
+          padding-left: 15px;
+          font-size: 14px;
+          &::placeholder {
+            font-size: 14px;
+            color: #9e9c9c;
+          }
+        }
+
+        .verify-code-input {
+          width: 100%;
+          height: 40px;
+          border-radius: 10px;
+          border: 1px solid #d3d3d3;
+          padding-left: 15px;
+          padding-right: 100px;
+          font-size: 14px;
+          box-sizing: border-box;
+          &::placeholder {
+            font-size: 14px;
+            color: #9e9c9c;
+          }
+        }
+
+        .get-code-text {
+          position: absolute;
+          right: 15px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #10a593;
+          font-size: 14px;
+          cursor: pointer;
+          user-select: none;
+          transition: all 0.3s;
+          z-index: 1; // 确保文字在清除图标下面
+
+          &:hover {
+            color: #0d8a7a;
+          }
+
+          &.disabled {
+            color: #cccccc;
+            cursor: not-allowed;
+
+            &:hover {
+              color: #cccccc;
+            }
+          }
+        }
+      }
+      .login-btn-line {
+        padding: 0 50px;
+      }
+      .password-line {
+        margin-bottom: 10px;
+      }
+      .input-line-text {
+        margin-left: 50px;
+        font-size: 14px;
+        color: #10a593;
+        text-align: left;
+        a {
+          color: #10a593;
+        }
+      }
+      .login-checkbox-line {
+        margin-left: 50px;
+        text-align: left;
+      }
+      .login-checkbox-line {
+        font-size: 14px;
+        font-weight: 400;
+      }
+      .login-checkbox-line label {
+        // 向右空出一个空格
+        margin-right: 0.5em;
+      }
+      .login-checkbox-line .span {
+        color: #10a593;
+        cursor: pointer;
+      }
+
+      .login-btn {
+        background: #10a593;
+        width: 100%;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        font-weight: 400;
+        font-size: 14px;
+        color: #ffffff;
+        border-radius: 10px;
+        margin: 10px auto;
+        cursor: pointer;
+        margin-bottom: 30px;
+      }
+
+      .login-error {
+        color: #ff0000;
+        font-size: 1rem;
+        margin: 30px 0 20px 0;
+      }
+    }
+  }
+}

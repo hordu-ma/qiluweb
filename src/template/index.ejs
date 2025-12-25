@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[0] %>">
+    <link rel="shortcut icon" type="image/x-icon" href="./static/favicon.ico" rel="external nofollow" />
+</head>
+
+<body>
+    <div id="app"></div>
+
+<!--     <script type="text/javascript"> -->
+<!--         var mydiv = document.createElement("div"); -->
+<!--         var myjs = document.createElement("script"); -->
+<!--         mydiv.style='z-index: 999999999;'; -->
+<!--         mydiv.innerHTML='<div id="chatbase-bubble-button" onclick="clickButton()"\n' + -->
+<!--             '        style="position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 25px; background-color: rgb(0, 0, 0); box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px; cursor: pointer; z-index: 999999998; transition: all 0.2s ease-in-out 0s; left: unset; transform: scale(1);">\n' + -->
+<!--             '            <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; z-index: 999999999;">\n' + -->
+<!--             '            <svg id="closeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.3" stroke="white" width="24" height="24">\n' + -->
+<!--             '            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>\n' + -->
+<!--             '        </svg>\n' + -->
+<!--             '        </div>\n' + -->
+<!--             '        </div>\n' + -->
+<!--             '\n' + -->
+<!--             '        <div id="chatbase-bubble-window"\n' + -->
+<!--             '             style="visibility: visible;position: fixed; flex-direction: column; justify-content: space-between; bottom: 80px; width: 400px; height: 600px; box-shadow: rgba(150, 150, 150, 0.2) 0px 10px 30px 0px, rgba(150, 150, 150, 0.2) 0px 0px 0px 1px; display: flex; border-radius: 10px; z-index: 999999999; overflow: hidden; right: 20px; left: unset;">\n' + -->
+<!--             '            <iframe src="http://192.168.191.44:8087/robot?configId=20caa3ec524e4fa8bf961b85546e0956" width="100%" height="100%" frameborder="0"></iframe>\n' + -->
+<!--             '        </div>\n' + -->
+<!--             '        </div>'; -->
+
+<!--         myjs.innerHTML = '' + -->
+<!--             'function clickButton(){\n' + -->
+<!--             '  var  chatbase= document.getElementById(\'chatbase-bubble-window\')\n' + -->
+<!--             '  if (chatbase.style.visibility == \'hidden\'){\n' + -->
+<!--             '    chatbase.style.visibility = \'visible\'\n' + -->
+<!--             '  }else {\n' + -->
+<!--             '    chatbase.style.visibility = \'hidden\'\n' + -->
+<!--             '  }\n' + -->
+<!--             '}'; -->
+<!--         document.body.appendChild(mydiv); -->
+<!--         document.body.appendChild(myjs); -->
+<!--     </script> -->
+
+
+    <script type="text/javascript" src="<%= htmlWebpackPlugin.files.js[0] %>"></script>
+    <script type="text/javascript" src="<%= htmlWebpackPlugin.files.js[1] %>"></script>
+</body>
+</html>
