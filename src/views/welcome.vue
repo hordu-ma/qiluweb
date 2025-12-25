@@ -304,9 +304,11 @@ export default {
     right: 0;
     height: 2px;
     background: #fff;
+    top: 0;
     transform: scaleX(0);
     transform-origin: center;
     transition: transform 0.2s ease;
+    border-radius: 999px;
   }
   .nav-link:hover::after {
     transform: scaleX(1);
