@@ -73,7 +73,15 @@ const hideLoad = () => {
 
 router.beforeEach((to, from, next) => {
   // 正常登录页，不拦截
-  if (to.name === "login" || to.name === "reset" || to.name === "welcome") {
+  const publicRouteNames = [
+    "login",
+    "reset",
+    "welcome",
+    "centerIntro",
+    "contact",
+    "platforms",
+  ];
+  if (publicRouteNames.includes(to.name)) {
     ViewUI.LoadingBar.start();
     Util.title(to.meta.title);
     next();
@@ -181,13 +189,18 @@ Vue.filter("time", function (value, type = "yyyy-MM-dd hh:mm:ss") {
       "S+": this.getMilliseconds(),
     };
     if (/(y+)/i.test(format)) {
-      format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+      format = format.replace(
+        RegExp.$1,
+        (this.getFullYear() + "").substr(4 - RegExp.$1.length)
+      );
     }
     for (var k in date) {
       if (new RegExp("(" + k + ")").test(format)) {
         format = format.replace(
           RegExp.$1,
-          RegExp.$1.length == 1 ? date[k] : ("00" + date[k]).substr(("" + date[k]).length)
+          RegExp.$1.length == 1
+            ? date[k]
+            : ("00" + date[k]).substr(("" + date[k]).length)
         );
       }
     }
