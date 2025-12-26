@@ -40,12 +40,34 @@
         <span class="nav-link" @click="goContact">联系我们</span>
       </nav>
     </div>
-    <div class="welcome-carousel">
-      <el-carousel :interval="4000" height="510px">
-        <el-carousel-item v-for="(image, index) in carouselImages" :key="index">
-          <img :src="image.url" :alt="image.title" class="carousel-image" />
-        </el-carousel-item>
-      </el-carousel>
+    <div class="welcome-carousel-section">
+      <div class="welcome-carousel">
+        <el-carousel :interval="4000" height="510px">
+          <el-carousel-item
+            v-for="(image, index) in carouselImages"
+            :key="index"
+          >
+            <img :src="image.url" :alt="image.title" class="carousel-image" />
+          </el-carousel-item>
+        </el-carousel>
+      </div>
+      <div class="center-news">
+        <div class="news-header">
+          <h2>中心动态</h2>
+          <span class="more-link">更多 ></span>
+        </div>
+        <div class="news-list">
+          <div v-for="news in centerNews" :key="news.id" class="news-item">
+            <div class="news-date">
+              <div class="date-day">{{ news.day }}</div>
+              <div class="date-month">{{ news.month }}</div>
+            </div>
+            <div class="news-content">
+              <div class="news-title">{{ news.title }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="content" v-loading="isLoading" element-loading-text="加载中...">
       <div
@@ -100,6 +122,32 @@ export default {
           id: "mediqube",
           title: "医知立方 MediQube",
           description: "知识融合与多模块协同平台",
+        },
+      ],
+      centerNews: [
+        {
+          id: 1,
+          day: "26",
+          month: "12/25",
+          title: "齐鲁医学混合现实教学平台正式启用，开启沉浸式医学教育新篇章",
+        },
+        {
+          id: 2,
+          day: "20",
+          month: "12/25",
+          title: "3D打印中心完成首批精准解剖模型交付，助力外科手术规划",
+        },
+        {
+          id: 3,
+          day: "15",
+          month: "12/25",
+          title: "灵境医览平台上线智能导航功能，提升临床诊疗可视化体验",
+        },
+        {
+          id: 4,
+          day: "10",
+          month: "12/25",
+          title: "医知立方MediQube知识中台与多家医院达成数据共享协议",
         },
       ],
       appList: [],
@@ -362,14 +410,20 @@ export default {
 .fade-leave-to {
   opacity: 0;
 }
-.welcome-carousel {
+.welcome-carousel-section {
   width: 100%;
+  height: 510px;
+  display: flex;
+  gap: 0;
+}
+.welcome-carousel {
+  flex: 2;
   height: 510px;
 
   .carousel-image {
     width: 100%;
     height: 100%;
-    object-fit: cover; // 保持图片比例，填满容器
+    object-fit: cover;
   }
 
   // 轮播图指示器样式 - 圆形
@@ -412,6 +466,87 @@ export default {
     width: 100%;
     height: 100%;
     overflow: hidden;
+  }
+}
+.center-news {
+  flex: 1;
+  background: #fff;
+  height: 510px;
+  display: flex;
+  flex-direction: column;
+  .news-header {
+    padding: 24px 28px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #10a593;
+    h2 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+      color: #0a3f63;
+    }
+    .more-link {
+      font-size: 14px;
+      color: #10a593;
+      cursor: pointer;
+      transition: color 0.2s ease;
+      &:hover {
+        color: #0d8578;
+      }
+    }
+  }
+  .news-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .news-item {
+    display: flex;
+    gap: 16px;
+    padding: 14px;
+    background: #f7fcfb;
+    border-radius: 12px;
+    border-left: 3px solid #10a593;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    &:hover {
+      transform: translateX(4px);
+      background: #ecf9f7;
+      box-shadow: 0 4px 12px rgba(16, 165, 147, 0.15);
+    }
+  }
+  .news-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    .date-day {
+      font-size: 26px;
+      font-weight: 700;
+      color: #10a593;
+      line-height: 1;
+    }
+    .date-month {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+  }
+  .news-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+  .news-title {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #1e293b;
+    font-weight: 500;
   }
 }
 .content {
