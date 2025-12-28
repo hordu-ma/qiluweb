@@ -94,9 +94,9 @@
 
 <script>
 // 导入图片资源
-import Bg1 from "../images/bg1.jpg";
-import Bg2 from "../images/bg2.jpg";
-import Bg3 from "../images/bg3.jpg";
+import Bg1 from "../images/bgimage1.jpg";
+import Bg2 from "../images/bgimage2.jpg";
+import Bg3 from "../images/bgimage3.jpg";
 
 export default {
   data() {
@@ -557,40 +557,46 @@ export default {
   }
 }
 .content {
-  padding-left: 160px;
-  padding-right: 45px;
-  padding-top: 45px;
-  display: flex;
-  flex-wrap: wrap;
+  padding: 48px 32px 60px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-column-gap: 32px;
+  grid-row-gap: 28px;
   .itemInfo {
     display: flex;
-    height: 110px;
+    min-height: 110px;
     align-items: center;
-    padding: 28px 42px;
-    margin-right: 28px;
-    margin-bottom: 30px;
+    padding: 28px 36px;
     border-radius: 10px;
     background: #ffffff;
     box-shadow: 0 3px 7px #10a59329;
     cursor: pointer;
+    gap: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(16, 165, 147, 0.15);
+    }
     .item-image {
       display: flex;
       align-items: center;
       justify-content: center;
-      flex: 1;
+      flex: 0 0 90px;
       .info-img {
         height: 74px;
         border-radius: 50%;
       }
       .info-img-single {
-        // width: 100%;
         height: 74px;
+        width: auto;
       }
     }
     .topBox {
       display: flex;
       flex-direction: column;
-      margin-left: 32px;
       .name {
         font-weight: 500;
         font-size: 18px;
@@ -604,6 +610,13 @@ export default {
         line-height: 34px;
       }
     }
+  }
+}
+
+@media (max-width: 900px) {
+  .content {
+    grid-template-columns: 1fr;
+    padding: 32px 16px 48px;
   }
 }
 </style>
