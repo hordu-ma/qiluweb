@@ -174,17 +174,11 @@ export default {
   mounted() {
     this.getAppList();
     this.$nextTick(() => {
-      const contentEl = document.querySelector(".content");
-      if (contentEl) {
-        contentEl.addEventListener("scroll", this.handleScroll);
-      }
+      window.addEventListener("scroll", this.handleScroll, { passive: true });
     });
   },
   beforeDestroy() {
-    const contentEl = document.querySelector(".content");
-    if (contentEl) {
-      contentEl.removeEventListener("scroll", this.handleScroll);
-    }
+    window.removeEventListener("scroll", this.handleScroll);
   },
   computed: {
     fullImageUrl() {
@@ -253,11 +247,21 @@ export default {
         });
     },
     handleScroll() {
-      const contentEl = document.querySelector(".content");
-      if (!contentEl || this.isLoading || !this.hasMore) return;
+      if (this.isLoading || !this.hasMore) return;
 
-      const { scrollTop, scrollHeight, clientHeight } = contentEl;
-      if (scrollTop + clientHeight >= scrollHeight - 100) {
+      const scrollTop =
+        window.pageYOffset ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop ||
+        0;
+      const viewportHeight =
+        window.innerHeight || document.documentElement.clientHeight || 0;
+      const docHeight = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight
+      );
+
+      if (scrollTop + viewportHeight >= docHeight - 120) {
         this.getAppList(true);
       }
     },
@@ -299,10 +303,13 @@ export default {
   background: #f9fafb;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh;
+  width: 100%;
 }
 .welcome-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   width: 100%;
   height: 60px;
   padding: 0 72px;
@@ -550,13 +557,11 @@ export default {
   }
 }
 .content {
-  flex: 1;
   padding-left: 160px;
   padding-right: 45px;
   padding-top: 45px;
   display: flex;
   flex-wrap: wrap;
-  overflow-y: auto;
   .itemInfo {
     display: flex;
     height: 110px;
