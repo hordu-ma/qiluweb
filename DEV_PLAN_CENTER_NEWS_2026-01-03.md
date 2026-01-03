@@ -480,3 +480,13 @@ A: 确认 Nginx `/pb/` 反代正常；检查图片文件名是否与 `{{img:n}}`
 
 **Q: 外网可以访问 Admin UI？**  
 A: 检查 Nginx `/pb/_/` location 的 allow/deny 规则是否生效；确认防火墙规则。
+
+## 15. 前端上线与回滚操作指引（对接生产脚本）
+
+- 本地构建与自测：`npm install` → `npm run build`，确认 `dist/` 静态资源可正常预览（含路由、接口、静态文件）。
+- 打包：将 `dist/` 压缩为带日期/版本号的包（例：`dist-20260103.zip`），可选生成 MD5 供上传后校验。
+- 上传：把压缩包上传至生产服务器目录 `/data/apps/bot-web-omni/up/`（与运维约定的上传路径保持一致）。
+- 解压：在服务器该目录解压得到 `dist/`，保持与脚本期望的目录结构一致。
+- 部署：执行 `/data/apps/bot-web-omni/script/bot-web-deploy-backup.sh`，脚本会先备份当前版本，再切换到最新 `dist/`。
+- 线上验证：访问生产站点，核对核心页面、接口请求与静态资源加载；必要时强制刷新缓存。
+- 回滚：若发现问题，执行 `/data/apps/bot-web-omni/script/bot-web-rollback.sh`，脚本会恢复到上一个备份版本；回滚后再次做线上验证。
