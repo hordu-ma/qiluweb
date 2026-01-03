@@ -14,17 +14,32 @@
           class="logo-shanda"
         />
       </div>
-      <nav class="welcome-nav">
+      <button
+        class="mobile-menu-btn"
+        type="button"
+        aria-label="展开导航"
+        @click="toggleMobileMenu"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="welcome-nav" :class="{ open: isMobileMenuOpen }">
         <span class="nav-link" @click="goHome">首页</span>
         <span class="nav-link" @click="goIntro">中心简介</span>
         <div
           class="nav-item nav-dropdown"
-          @mouseenter="showDropdown = true"
-          @mouseleave="showDropdown = false"
+          @mouseenter="handleDropdownHover(true)"
+          @mouseleave="handleDropdownHover(false)"
+          @click="toggleDropdown"
         >
           <span class="nav-link">二级平台</span>
           <transition name="fade">
-            <div v-if="showDropdown" class="dropdown-menu">
+            <div
+              v-if="showDropdown"
+              class="dropdown-menu"
+              :class="{ 'dropdown-menu-mobile': isMobile }"
+            >
               <div
                 v-for="platform in secondaryPlatforms"
                 :key="platform.id"
@@ -40,9 +55,14 @@
         <span class="nav-link" @click="goContact">联系我们</span>
       </nav>
     </div>
+    <div
+      v-if="isMobileMenuOpen && isMobile"
+      class="mobile-nav-mask"
+      @click="closeMobileMenu"
+    ></div>
     <div class="welcome-carousel-section">
       <div class="welcome-carousel">
-        <el-carousel :interval="4000" height="510px">
+        <el-carousel :interval="4000" :height="carouselHeight">
           <el-carousel-item
             v-for="(image, index) in carouselImages"
             :key="index"
@@ -108,6 +128,8 @@ export default {
   data() {
     return {
       showDropdown: false,
+      isMobileMenuOpen: false,
+      isMobile: false,
       secondaryPlatforms: [
         {
           id: "medxr",
@@ -178,6 +200,8 @@ export default {
     };
   },
   mounted() {
+    this.handleResize();
+    window.addEventListener("resize", this.handleResize, { passive: true });
     this.getAppList();
     this.getCenterNews();
     this.$nextTick(() => {
@@ -186,6 +210,7 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener("scroll", this.handleScroll);
+    window.removeEventListener("resize", this.handleResize);
   },
   computed: {
     fullImageUrl() {
@@ -193,18 +218,54 @@ export default {
         import.meta.env.VITE_IMAGE_BASE_URL || "http://47.236.254.2";
       return (avatar) => `${baseUrl}${avatar}`;
     },
+    carouselHeight() {
+      return this.isMobile ? "260px" : "510px";
+    },
   },
   methods: {
+    handleResize() {
+      this.isMobile = window.innerWidth <= 900;
+      if (!this.isMobile) {
+        this.isMobileMenuOpen = false;
+      }
+    },
+    toggleMobileMenu() {
+      this.isMobileMenuOpen = !this.isMobileMenuOpen;
+      if (!this.isMobileMenuOpen) {
+        this.showDropdown = false;
+      }
+    },
+    closeMobileMenu() {
+      this.isMobileMenuOpen = false;
+      this.showDropdown = false;
+    },
+    closeNavAfterAction() {
+      this.showDropdown = false;
+      if (this.isMobile) {
+        this.isMobileMenuOpen = false;
+      }
+    },
+    handleDropdownHover(visible) {
+      if (this.isMobile) return;
+      this.showDropdown = visible;
+    },
+    toggleDropdown() {
+      if (!this.isMobile) return;
+      this.showDropdown = !this.showDropdown;
+    },
     goHome() {
       if (this.$route.path !== "/welcome") {
         this.$router.push({ path: "/welcome" });
       }
+      this.closeNavAfterAction();
     },
     goIntro() {
       this.$router.push({ path: "/center-intro" });
+      this.closeNavAfterAction();
     },
     goContact() {
       this.$router.push({ path: "/contact" });
+      this.closeNavAfterAction();
     },
     navigateToPlatform(platform) {
       this.showDropdown = false;
@@ -212,9 +273,11 @@ export default {
         path: "/platforms",
         query: { module: platform.id },
       });
+      this.closeNavAfterAction();
     },
     goNewsList() {
       this.$router.push({ name: "newsList" });
+      this.closeNavAfterAction();
     },
     goNewsDetail(id) {
       if (!id) return;
@@ -335,7 +398,7 @@ export default {
   },
   watch: {
     $route() {
-      this.showDropdown = false;
+      this.closeMobileMenu();
     },
   },
 };
@@ -361,6 +424,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   .welcome-logo {
     display: flex;
     align-items: center;
@@ -383,6 +447,7 @@ export default {
     color: #fff;
     font-size: 16px;
     letter-spacing: 0.02em;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
   }
   .nav-link {
     cursor: pointer;
@@ -452,6 +517,38 @@ export default {
     color: #4f5b72;
   }
 }
+.mobile-menu-btn {
+  display: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  span {
+    width: 100%;
+    height: 2px;
+    background: #fff;
+    border-radius: 999px;
+  }
+  &:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.55);
+  }
+}
+.mobile-nav-mask {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 14;
+}
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s ease;
@@ -476,7 +573,6 @@ export default {
     object-fit: cover;
   }
 
-  // 轮播图指示器样式 - 圆形
   ::v-deep .el-carousel__indicators {
     .el-carousel__indicator {
       .el-carousel__button {
@@ -496,12 +592,10 @@ export default {
     }
   }
 
-  // 水平居中指示器
   ::v-deep .el-carousel__indicators--horizontal {
     bottom: 30px;
   }
 
-  // 确保轮播图容器和项占满宽度
   ::v-deep .el-carousel {
     width: 100%;
     height: 100%;
@@ -657,9 +751,128 @@ export default {
 }
 
 @media (max-width: 900px) {
+  .welcome-header {
+    height: 56px;
+    padding: 0 16px;
+    box-shadow: 0 10px 22px rgba(16, 165, 147, 0.2);
+    .welcome-logo {
+      height: 56px;
+      .logo-shanda {
+        width: 150px;
+        height: 38px;
+      }
+      .logo-line {
+        height: 16px;
+      }
+    }
+    .welcome-nav {
+      position: absolute;
+      top: 56px;
+      left: 0;
+      right: 0;
+      background: #fff;
+      color: #0a3f63;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 12px 16px 18px;
+      gap: 12px;
+      box-shadow: 0 12px 30px rgba(16, 165, 147, 0.18);
+      max-height: 0;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 21;
+    }
+    .welcome-nav.open {
+      max-height: 420px;
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .nav-link {
+      color: #0a3f63;
+      padding: 8px 0;
+    }
+    .nav-dropdown {
+      width: 100%;
+    }
+    .dropdown-menu {
+      position: relative;
+      right: auto;
+      top: auto;
+      box-shadow: none;
+      padding: 0;
+    }
+    .dropdown-menu-mobile {
+      width: 100%;
+      background: transparent;
+      border-radius: 0;
+      padding-top: 6px;
+      gap: 8px;
+    }
+  }
+  .mobile-menu-btn {
+    display: inline-flex;
+  }
+  .mobile-nav-mask {
+    display: block;
+  }
+  .welcome-carousel-section {
+    flex-direction: column;
+    height: auto;
+  }
+  .welcome-carousel {
+    height: auto;
+  }
+  .center-news {
+    height: auto;
+    min-height: 0;
+    .news-header {
+      padding: 16px 16px 10px;
+    }
+    .news-list {
+      max-height: 360px;
+    }
+    .news-item {
+      gap: 12px;
+    }
+  }
+  .content {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    padding: 24px 16px 40px;
+    grid-column-gap: 18px;
+    grid-row-gap: 18px;
+  }
+  .content .itemInfo {
+    padding: 20px 24px;
+    min-height: unset;
+  }
+}
+@media (max-width: 768px) {
   .content {
     grid-template-columns: 1fr;
-    padding: 32px 16px 48px;
+    padding: 20px 14px 36px;
+  }
+  .content .itemInfo {
+    padding: 18px 20px;
+  }
+}
+@media (max-width: 600px) {
+  .welcome-header .welcome-logo .logo-shanda {
+    width: 132px;
+  }
+  .welcome-carousel-section {
+    row-gap: 10px;
+  }
+  .center-news .news-item {
+    align-items: flex-start;
+  }
+  .center-news .news-title {
+    font-size: 13px;
+  }
+  .content .itemInfo {
+    padding: 16px 18px;
+  }
+  .content .topBox .name {
+    font-size: 16px;
   }
 }
 </style>
