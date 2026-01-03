@@ -59,6 +59,22 @@ const routers = [
     component: () => import("./views/platforms.vue"),
   },
   {
+    path: "/news",
+    name: "newsList",
+    meta: {
+      title: "中心动态",
+    },
+    component: () => import("./views/news/list.vue"),
+  },
+  {
+    path: "/news/:id",
+    name: "newsDetail",
+    meta: {
+      title: "中心动态详情",
+    },
+    component: () => import("./views/news/detail.vue"),
+  },
+  {
     path: "/index",
     name: "index",
     redirect: "main",

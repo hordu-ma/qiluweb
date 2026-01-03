@@ -1,0 +1,104 @@
+[
+  {
+    "id": "center_news_collection",
+    "name": "center_news",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "id": "field_title",
+        "name": "title",
+        "type": "text",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": 1,
+          "max": 200,
+          "pattern": ""
+        }
+      },
+      {
+        "id": "field_summary",
+        "name": "summary",
+        "type": "text",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": 500,
+          "pattern": ""
+        }
+      },
+      {
+        "id": "field_body",
+        "name": "body",
+        "type": "text",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": 1,
+          "max": null,
+          "pattern": ""
+        }
+      },
+      {
+        "id": "field_status",
+        "name": "status",
+        "type": "select",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "maxSelect": 1,
+          "values": ["draft", "published"]
+        }
+      },
+      {
+        "id": "field_publish_at",
+        "name": "publish_at",
+        "type": "date",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": "",
+          "max": ""
+        }
+      },
+      {
+        "id": "field_images",
+        "name": "images",
+        "type": "file",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "maxSelect": 10,
+          "maxSize": 5242880,
+          "mimeTypes": ["image/jpeg", "image/png", "image/gif", "image/webp"],
+          "thumbs": [],
+          "protected": false
+        }
+      }
+    ],
+    "indexes": [
+      "CREATE INDEX idx_status ON center_news (status)",
+      "CREATE INDEX idx_publish_at ON center_news (publish_at)"
+    ],
+    "listRule": "status = 'published'",
+    "viewRule": "status = 'published'",
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "options": {}
+  }
+]

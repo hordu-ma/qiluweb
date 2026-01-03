@@ -80,6 +80,8 @@ router.beforeEach((to, from, next) => {
     "centerIntro",
     "contact",
     "platforms",
+    "newsList",
+    "newsDetail",
   ];
   if (publicRouteNames.includes(to.name)) {
     ViewUI.LoadingBar.start();

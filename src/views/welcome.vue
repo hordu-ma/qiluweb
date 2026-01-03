@@ -54,10 +54,15 @@
       <div class="center-news">
         <div class="news-header">
           <h2>中心动态</h2>
-          <span class="more-link">更多 ></span>
+          <span class="more-link" @click="goNewsList">更多 ></span>
         </div>
         <div class="news-list">
-          <div v-for="news in centerNews" :key="news.id" class="news-item">
+          <div
+            v-for="news in centerNews"
+            :key="news.id"
+            class="news-item"
+            @click="goNewsDetail(news.id)"
+          >
             <div class="news-date">
               <div class="date-day">{{ news.day }}</div>
               <div class="date-month">{{ news.month }}</div>
@@ -97,6 +102,7 @@
 import Bg1 from "../images/bgimage1.jpg";
 import Bg2 from "../images/bgimage2.jpg";
 import Bg3 from "../images/bgimage3.jpg";
+import { listCenterNews } from "@/libs/pb";
 
 export default {
   data() {
@@ -173,6 +179,7 @@ export default {
   },
   mounted() {
     this.getAppList();
+    this.getCenterNews();
     this.$nextTick(() => {
       window.addEventListener("scroll", this.handleScroll, { passive: true });
     });
@@ -205,6 +212,42 @@ export default {
         path: "/platforms",
         query: { module: platform.id },
       });
+    },
+    goNewsList() {
+      this.$router.push({ name: "newsList" });
+    },
+    goNewsDetail(id) {
+      if (!id) return;
+      this.$router.push({ name: "newsDetail", params: { id } });
+    },
+    async getCenterNews() {
+      try {
+        const data = await listCenterNews({ page: 1, perPage: 4 });
+        const items = Array.isArray(data.items) ? data.items : [];
+        const mapped = items.map((it) => {
+          const dateValue = it.publish_at || it.created;
+          const d = new Date(dateValue);
+          const day = Number.isNaN(d.getTime())
+            ? ""
+            : String(d.getDate()).padStart(2, "0");
+          const month = Number.isNaN(d.getTime())
+            ? ""
+            : `${String(d.getMonth() + 1).padStart(2, "0")}/${String(
+                d.getFullYear()
+              ).slice(-2)}`;
+          return {
+            id: it.id,
+            day,
+            month,
+            title: it.title,
+          };
+        });
+        if (mapped.length) {
+          this.centerNews = mapped;
+        }
+      } catch (e) {
+        // 保留静态兜底数据
+      }
     },
     getAppList(isLoadMore = false) {
       if (this.isLoading || !this.hasMore) return;
