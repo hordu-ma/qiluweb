@@ -1,0 +1,32 @@
+# PocketBase 独立部署（适配现有 nginx 容器环境）
+# 注意：生产环境已有 nginx 容器占用 80/443 端口，因此仅部署 PocketBase
+version: "3.8"
+
+services:
+  pocketbase:
+    image: ghcr.io/muchobien/pocketbase:latest
+    container_name: pocketbase
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8090:8090" # 仅本地访问，外部通过 nginx 反代
+    volumes:
+      - /data/pocketbase/pb_data:/pb/pb_data
+    environment:
+      - PB_PUBLIC_URL=https://education.qiluhospital.com/pb
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8090/api/health",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+# 说明：
+# 1. 无需定义 networks，启动后手动加入现有 nginx 容器所在网络
+# 2. 端口绑定到 127.0.0.1，避免外部直接访问
+# 3. 如需使用 docker-compose，执行：docker-compose up -d && docker network connect <nginx_network> pocketbase

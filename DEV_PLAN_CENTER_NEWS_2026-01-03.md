@@ -1,35 +1,186 @@
-# 中心动态模块上线指北（PocketBase + 子路径）
+# PocketBase CMS 部署与使用指南
 
-> 生产此前仅有静态站点，PocketBase 为新引入组件。本文压缩关键信息，便于首发与后续维护。
+> 本文档记录了 PocketBase 在生产环境（education.qiluhospital.com）的完整部署过程和使用方法。
 
-## 1. 目标与范围
+## 部署概览
 
-- 目标：提供“中心动态”列表/详情与首页摘要；内容由 PocketBase 管理，发布后前端无需重构。
-- 范围：前端路由 `/news`、`/news/:id`；首页“更多”跳转；PocketBase `center_news` 集合及只读 API；Nginx `/pb/` 反代与 `/pb/_/` 内网限制。
-- 不做：富文本编辑器、复杂审核流、搜索/标签等扩展。
+**已完成部署内容：**
 
-## 2. 方案概要
+- ✅ PocketBase 容器运行在 Docker (internal_network)
+- ✅ Nginx 反向代理配置（/pb/ 路径）
+- ✅ 前端代码集成 PocketBase SDK
+- ✅ center_news 集合配置与权限设置
+- ✅ 管理员账号创建
 
-- 同域子路径：`/` 前端、`/api/*` 现有后端、`/pb/*` PocketBase（去前缀反代）。
-- 集合字段：`title`(必填)、`summary`、`body`(纯文本+占位符)、`status`(draft/published)、`publish_at`(date)、`images`(多图，可扩展 `cover`/`sort`)。
-- 权限：匿名仅读已发布；写仅 Admin；Admin UI 仅内网。
-- 正文占位符：`{{img:n}}` 对应 `images[n-1]`，正文渲染不使用 `v-html`。
+**访问地址：**
 
-## 3. 必要配置
+- 管理后台：`https://education.qiluhospital.com/pb/_/`
+- API 端点：`https://education.qiluhospital.com/pb/api/`
+- 前端页面：`https://education.qiluhospital.com/news`
 
-- 前端环境：`VITE_PB_BASE_URL=/pb`。
-- PocketBase：`PB_PUBLIC_URL=https://<域名>/pb`（推荐）；持久化目录 `pb_data/`（含 data.db、logs.db、storage/）。
-- Nginx 关键：
-  - `/pb/_/`：allow 内网，deny 外网，`proxy_pass http://127.0.0.1:8090/_/`（如用容器则改为容器名）。
-  - `/pb/`：`proxy_pass http://127.0.0.1:8090/`；保留 `X-Forwarded-*` 头，支持 WebSocket。
+---
 
-## 4. 首次上线步骤（生产原无 PocketBase）
+## 1. 架构说明
 
-1. 部署 PocketBase：Systemd 或容器任选；监听 127.0.0.1:8090，`pb_data` 挂载持久目录。
-2. 初始化：内网或 SSH 转发访问 `/pb/_/`，创建管理员；导入 `pocketbase/pb_schema.json`；规则设为“已发布匿名读，写仅 Admin”。
-3. 配置 Nginx 并 reload：确认 `/pb/`、`/pb/_/` 反代和白名单；HTTPS 与主站一致。
-4. 前端构建/部署：`npm install && npm run build`，将 `dist/` 部署到 Nginx root（默认 `/usr/share/nginx/html`）。
-5. 验证：`curl https://<域名>/pb/api/health` 为 200；外网 `/pb/_/` 返回 403；前端 `/news`、`/news/:id`、首页“更多”可读取发布数据。
+### 1.1 技术栈
+
+- **后端 CMS**：PocketBase v0.22.20 (Go + SQLite)
+- **前端框架**：Vue.js 2 + Element UI
+- **反向代理**：Nginx (Docker)
+- **数据存储**：SQLite + 文件存储
+
+### 1.2 路由设计
+
+- `/` - 前端静态站点
+- `/pb/` - PocketBase API（公开只读）
+- `/pb/_/` - PocketBase 管理后台（需登录）
+- `/news` - 新闻列表页
+- `/news/:id` - 新闻详情页
+
+### 1.3 数据模型
+
+**center_news 集合字段：**
+
+- `title` (文本，必填) - 新闻标题
+- `summary` (文本) - 摘要
+- `body` (文本) - 正文内容
+- `status` (单选) - draft/published
+- `publish_at` (日期) - 发布时间
+- `images` (文件，多个) - 新闻图片
+
+---
+
+## 2. 生产环境部署记录
+
+### 2.1 服务器信息
+
+- **操作系统**：Ubuntu 24.04.2 LTS (Linux 6.8.0-56-generic x86_64)
+- **域名**：education.qiluhospital.com
+- **Docker 网络**：internal_network
+- **数据目录**：/data/pocketbase/pb_data
+- **Nginx 配置**：/data/nginx/conf/default.conf
+
+### 2.2 PocketBase 容器配置
+
+```bash
+docker run -d \
+  --name pocketbase \
+  --restart unless-stopped \
+  --network internal_network \
+  -p 127.0.0.1:8090:8090 \
+  -v /data/pocketbase/pb_data:/pb/pb_data \
+  -e PB_PUBLIC_URL=https://education.qiluhospital.com/pb \
+  pocketbase:latest
+```
+
+### 2.3 Nginx 反向代理配置
+
+在 `/data/nginx/conf/default.conf` 的第一个 server 块中添加：
+
+```nginx
+# PocketBase CMS 反向代理
+location ^~ /pb/_/ {
+    proxy_pass http://pocketbase:8090/_/;
+    proxy_set_header   X-Forwarded-Proto $scheme;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-Real-IP         $remote_addr;
+    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+}
+
+location ^~ /pb/ {
+    proxy_pass http://pocketbase:8090/;
+    proxy_set_header   X-Forwarded-Proto $scheme;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-Real-IP         $remote_addr;
+    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+}
+```
+
+### 2.4 前端环境变量
+
+`.env` 文件配置：
+
+```
+VITE_PB_BASE_URL=/pb
+```
+
+---
+
+## 3. 日常使用指南
+
+### 3.1 发布新闻
+
+**步骤：**
+
+1. 访问管理后台：`https://education.qiluhospital.com/pb/_/`
+2. 使用管理员账号登录
+3. 进入 **center_news** 集合
+4. 点击 **New record** 创建新闻：
+   - **title**：输入新闻标题
+   - **summary**：输入摘要（可选）
+   - **body**：输入正文内容
+   - **images**：上传新闻图片（可多张）
+   - **status**：选择 `published`（发布）或 `draft`（草稿）
+   - **publish_at**：选择发布日期
+5. 点击 **Create** 保存
+
+**注意事项：**
+
+- 只有 `status=published` 的新闻会在前端显示
+- 图片会自动存储在 `/data/pocketbase/pb_data/storage/`
+- 正文支持换行，前端会自动渲染
+
+### 3.2 编辑/删除新闻
+
+1. 进入 **center_news** 集合
+2. 点击要编辑的记录
+3. 修改后点击 **Save** 或点击 **Delete** 删除
+
+### 3.3 查看前端效果
+
+- **新闻列表**：`https://education.qiluhospital.com/news`
+- **新闻详情**：点击列表中的新闻标题
+- **首页摘要**：首页右侧"中心动态"区域显示最新 4 条
+
+---
+
+## 4. 前端更新部署流程
+
+### 4.1 本地构建
+
+```bash
+# 1. 确保环境变量正确
+echo "VITE_PB_BASE_URL=/pb" > .env
+
+# 2. 安装依赖并构建
+npm install
+npm run build
+
+# 3. 打包构建产物
+tar -czf qiluweb-dist.tar.gz dist/
+
+# 4. 复制到 Windows 临时目录（WSL环境）
+cp qiluweb-dist.tar.gz /mnt/c/tmp/
+```
+
+### 4.2 上传到服务器
+
+通过堡垒机 Web 界面上传 `C:\tmp\qiluweb-dist.tar.gz` 到服务器 `/tmp/` 目录
+
+### 4.3 服务器部署
+
+```bash
+# 1. 解压到部署目录
+cd /data/nginx/up
+sudo rm -rf *
+sudo tar -xzf /tmp/qiluweb-dist.tar.gz
+
+# 2. 执行部署脚本
+sudo bash /data/nginx/script/bot-web-deploy-backup.sh
+
+# 3. 验证部署
+ls -lh /data/nginx/html/
+```
 
 ## 5. 内容发布与更新
 
@@ -50,13 +201,32 @@
 - [ ] 至少一条 `published` 数据前端可见
 - [ ] `pb_data` 持久化并有备份计划
 
-## 8. 生产信息收集清单（堡垒机询问项）
+## 8. 生产信息收集清单（待确认部分）
 
-- 基础环境：生产 OS/版本、CPU 架构；PocketBase 运行方式与版本；端口（默认 8090）
-- 数据与存储：生产 `pb_data` 路径，是否已有数据；存储介质；备份策略与保留周期
-- 域名与协议：PocketBase 对外域名/子路径（`/pb/`）、HTTPS 及证书来源
-- 反代与网络：nginx 是否同机；LB/WAF 要求；WebSocket 支持；上游为 `127.0.0.1:8090` 还是容器名
-- 访问控制：`/pb/_/` 内网白名单；防火墙/安全组开放情况；是否需要 CORS 域名列表
-- 环境变量：`PB_PUBLIC_URL` 期望值；SMTP/对象存储/鉴权配置；日志路径与切割
-- 前端指向：API 前缀（`/api`、`/pb`）与部署根目录是否一致；生产 nginx.conf 实际路径
-- 守护与监控：进程守护/重启策略；是否需健康检查端点给上游
+- [x] 基础环境：Ubuntu (Linux 6.8.0-56-generic x86_64)；Docker 部署
+- [x] 域名与协议：`https://education.qiluhospital.com/pb/`
+- [x] 数据与存储：宿主机 `/data/pocketbase/pb_data`
+- [x] 访问控制：移除 IP 限制，依赖 PocketBase 鉴权
+- [x] 前端部署：上传至 `/data/nginx/up`，脚本部署至 `/data/nginx/html`
+- [ ] **待确认**：现有 Nginx 容器名称与运行方式
+- [ ] **待确认**：是否已有其他服务使用 Docker Compose（避免冲突）
+- [ ] **待确认**：生产环境是否允许拉取 `ghcr.io` 镜像（或需提前推送到内部镜像仓库）
+
+### 8.1 需在堡垒机执行的确认命令
+
+```bash
+# 1. 查看现有 Docker 容器（确认 Nginx 容器名与网络模式）
+docker ps -a --format "table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"
+
+# 2. 检查现有 Nginx 容器的网络配置
+docker inspect <nginx容器名> | grep -A 10 Networks
+
+# 3. 确认 /data/nginx 目录结构
+ls -lh /data/nginx/
+
+# 4. 检查是否已有 docker-compose 部署
+find /data -name docker-compose.yml 2>/dev/null
+
+# 5. 测试镜像拉取（可选）
+docker pull ghcr.io/muchobien/pocketbase:latest
+```

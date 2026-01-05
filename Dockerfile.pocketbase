@@ -1,0 +1,23 @@
+# PocketBase Dockerfile（基于 Alpine Linux，轻量级）
+FROM alpine:latest
+
+# 设置工作目录
+WORKDIR /pb
+
+# 安装依赖
+RUN apk add --no-cache \
+    ca-certificates \
+    wget \
+    unzip
+
+# 下载并安装 PocketBase
+RUN wget https://github.com/pocketbase/pocketbase/releases/download/v0.22.20/pocketbase_0.22.20_linux_amd64.zip \
+    && unzip pocketbase_0.22.20_linux_amd64.zip \
+    && rm pocketbase_0.22.20_linux_amd64.zip \
+    && chmod +x pocketbase
+
+# 暴露端口
+EXPOSE 8090
+
+# 启动命令
+CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8090"]
