@@ -1,59 +1,71 @@
-# view-ui-project
+# qiluweb
 
-This project is build for Vue.js 2 + vue-router + webpack2 + View UI (iView) 4, just install and run.
+齐鲁相关门户与管理前端项目（Vue 2.7 + Vite 4），包含公开页面（欢迎页/中心简介/中心动态等）与管理模块页面（智能体/知识库/历史记录等，是否启用由路由守卫策略决定）。
 
-## Install
-```bush
-// install dependencies
+- 公开“中心动态”数据源：PocketBase（通过 `/pb` 反向代理访问）
+- 生产静态部署：Nginx（仓库内 `Dockerfile` + `nginx.conf`）
+
+## 1. 开发环境要求
+
+- Node.js：建议 18+
+- npm：建议 9+
+
+## 2. 本地开发
+
+```bash
 npm install
-```
-## Run
-### Development
-```bush
-// For the first time, run init to create index.html
-npm run init
 npm run dev
 ```
-### Production(Build)
-```bush
-npm run init
 
+默认启动地址通常为 `http://localhost:5173/`。
+
+## 3. 构建与预览
+
+```bash
 npm run build
+npm run preview
 ```
 
+## 4. 环境变量（.env）
 
+项目通过 Vite 环境变量配置运行时行为（见 `.env` / `.env.production`）：
 
+- `VITE_ROUTE_BASE_URL`：路由 base（通常为 `/`）
+- `VITE_IMAGE_BASE_URL`：图片资源域名/前缀
+- `VITE_PB_BASE_URL`：PocketBase 子路径前缀（生产推荐 `/pb`）
+- `VITE_PB_DEV_PROXY_TARGET`：本地开发时 PocketBase 代理目标（默认 `http://127.0.0.1:8090`）
 
+## 5. 本地代理说明（Vite）
 
+开发环境下（`vite.config.js`）配置了代理：
 
+- `/api`、`/auth`：转发到后端服务（并做路径 rewrite）
+- `/pb`：转发到 PocketBase（用于本地联调中心动态）
 
-### 编译代码(npm run build有问题，未解决)
+## 6. 生产部署（Nginx 镜像）
+
+仓库提供了基于 Nginx 的静态站点镜像构建方式：
+
 ```bash
-npm run init
-
-npm run dev
-```
-### 构建镜像
-```bash
- docker -H 192.168.191.44 build -t  bespin/bot-manager:latest .
-```
-### 部署镜像
-```bash
- docker run --restart=always -itd -p8061:80 -v/tmp/web:/weblog --name haleon-bot-manager bespin/bot-manager
+npm run build
+docker build -t qiluweb:latest .
+docker run --rm -p 8080:80 -v /tmp/web:/weblog qiluweb:latest
 ```
 
-###
-docker login --username=lsy01426683@1862559946566560 registry.cn-shanghai.aliyuncs.com
-Haleon@0106
-8T9*ZXGD1v
-docker tag  5fc8fb63d5d7 registry.cn-shanghai.aliyuncs.com/ai-copilot/ai-copilot-manage:test
-docker push registry.cn-shanghai.aliyuncs.com/ai-copilot/ai-copilot-manage:test
+如需启用 PocketBase 反代与 `/api` 反代，请根据实际环境调整 `nginx.conf` 后重新构建镜像。
 
-docker tag a4d219211488 registry.cn-shanghai.aliyuncs.com/ai-copilot/ai-copilot-manage:prod
-docker push registry.cn-shanghai.aliyuncs.com/ai-copilot/ai-copilot-manage:prod
-### 访问测试
-```bash
-http://192.168.191.44:8065/login
+## 7. PocketBase（中心动态）
 
-http://192.168.191.44:8065/
-```
+- 详细部署与使用说明：`DEV_PLAN_CENTER_NEWS_2026-01-03.md`
+- 前端调用封装：`src/libs/pb.js`
+- 页面：
+  - 列表：`/news`（`src/views/news/list.vue`）
+  - 详情：`/news/:id`（`src/views/news/detail.vue`）
+
+## 8. 项目 Review 报告
+
+- 全量 Review 报告：`PROJECT_REVIEW_REPORT.md`
+
+## 9. 安全提醒
+
+请勿在仓库中提交任何明文账号、密码、Token、镜像仓库登录信息或内网敏感地址；建议使用环境变量、CI Secret 或安全的密钥管理系统注入。
